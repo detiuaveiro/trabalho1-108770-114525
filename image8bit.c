@@ -171,8 +171,26 @@ Image ImageCreate(int width, int height, uint8 maxval) { ///
   assert (width >= 0);
   assert (height >= 0);
   assert (0 < maxval && maxval <= PixMax);
-  // Insert your code here!
+  Image img = (Image)malloc(sizeof(struct image));
+  if (img == NULL) {
+    errCause = "Failed to allocate memory for image structure";
+    return NULL;
+  }
+
+  img->width = width;
+  img->height = height;
+  img->maxval = maxval;
+  img->pixel = (uint8*)malloc(sizeof(uint8) * width * height);
+
+  if (img->pixel == NULL) {
+    free(img); // Clean up the allocated image structure
+    errCause = "Failed to allocate memory for image pixels";
+    return NULL;
+  }
+
+  return img;
 }
+// Insert your code here!
 
 /// Destroy the image pointed to by (*imgp).
 ///   imgp : address of an Image variable.
@@ -182,6 +200,11 @@ Image ImageCreate(int width, int height, uint8 maxval) { ///
 void ImageDestroy(Image* imgp) { ///
   assert (imgp != NULL);
   // Insert your code here!
+  if (*imgp != NULL) {
+    free((*imgp)->pixel);
+    free(*imgp);
+    *imgp = NULL;
+  }
 }
 
 
@@ -293,7 +316,22 @@ int ImageMaxval(Image img) { ///
 /// *max is set to the maximum.
 void ImageStats(Image img, uint8* min, uint8* max) { ///
   assert (img != NULL);
+
   // Insert your code here!
+  assert(min != NULL && max != NULL);
+  *min = *max = ImageGetPixel(img, 0, 0);
+
+  for (int y = 0; y < img->height; ++y) {
+    for (int x = 0; x < img->width; ++x) {
+      uint8 pixel = ImageGetPixel(img, x, y);
+      if (pixel < *min) {
+        *min = pixel;
+      }
+      if (pixel > *max) {
+        *max = pixel;
+      }
+    }
+  }
 }
 
 /// Check if pixel position (x,y) is inside img.
@@ -306,6 +344,8 @@ int ImageValidPos(Image img, int x, int y) { ///
 int ImageValidRect(Image img, int x, int y, int w, int h) { ///
   assert (img != NULL);
   // Insert your code here!
+  return (0 <= x && x + w <= img->width) && (0 <= y && y + h <= img->height);
+
 }
 
 /// Pixel get & set operations
@@ -319,8 +359,9 @@ int ImageValidRect(Image img, int x, int y, int w, int h) { ///
 // This internal function is used in ImageGetPixel / ImageSetPixel. 
 // The returned index must satisfy (0 <= index < img->width*img->height)
 static inline int G(Image img, int x, int y) {
-  int index;
   // Insert your code here!
+  assert(img != NULL);
+  int index = y * img->width + x;
   assert (0 <= index && index < img->width*img->height);
   return index;
 }
