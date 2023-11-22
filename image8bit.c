@@ -171,26 +171,33 @@ Image ImageCreate(int width, int height, uint8 maxval) { ///
   assert (width >= 0);
   assert (height >= 0);
   assert (0 < maxval && maxval <= PixMax);
+  // Insert your code here!
+
   Image img = (Image)malloc(sizeof(struct image));
   if (img == NULL) {
-    errCause = "Failed to allocate memory for image structure";
+    errCause = "Memory allocation failed, image not created.";
     return NULL;
   }
 
+  //Propriedades da imagem
   img->width = width;
   img->height = height;
   img->maxval = maxval;
   img->pixel = (uint8*)malloc(sizeof(uint8) * width * height);
 
   if (img->pixel == NULL) {
-    free(img); // Clean up the allocated image structure
-    errCause = "Failed to allocate memory for image pixels";
+    free(img);
+    errCause = "Memory allocation failed, image not created.";
     return NULL;
+  }
+  // Todos os pixeis a preto.
+  for (int i = 0; i < width * height; i++) {
+    img->pixel[i] = 0;
   }
 
   return img;
 }
-// Insert your code here!
+
 
 /// Destroy the image pointed to by (*imgp).
 ///   imgp : address of an Image variable.
@@ -200,10 +207,11 @@ Image ImageCreate(int width, int height, uint8 maxval) { ///
 void ImageDestroy(Image* imgp) { ///
   assert (imgp != NULL);
   // Insert your code here!
+
   if (*imgp != NULL) {
-    free((*imgp)->pixel);
-    free(*imgp);
-    *imgp = NULL;
+    free((*imgp)->pixel); // Liberta a memoria alocada para os pixeis.
+    free(*imgp); // Liberta a memeria alocada para a estrutura image.
+    *imgp = NULL; // define o ponteiro para NULL.
   }
 }
 
@@ -320,7 +328,7 @@ void ImageStats(Image img, uint8* min, uint8* max) { ///
   // Insert your code here!
   assert(min != NULL && max != NULL);
   *min = *max = ImageGetPixel(img, 0, 0);
-
+  // atualizacao dos valores minimos e maximos dos pixeis.
   for (int y = 0; y < img->height; ++y) {
     for (int x = 0; x < img->width; ++x) {
       uint8 pixel = ImageGetPixel(img, x, y);
