@@ -344,8 +344,9 @@ int ImageValidPos(Image img, int x, int y) { ///
 int ImageValidRect(Image img, int x, int y, int w, int h) { ///
   assert (img != NULL);
   // Insert your code here!
-  return (0 <= x && x + w <= img->width) && (0 <= y && y + h <= img->height);
-
+  int first_test = x >= 0 && y >= 0 && w > 0 && h > 0;
+  int second_test =  x <= img-> width && y <= img->height && w <= img->width && h <= img->height;
+  return first_test, second_test;
 }
 
 /// Pixel get & set operations
@@ -397,6 +398,10 @@ void ImageSetPixel(Image img, int x, int y, uint8 level) { ///
 void ImageNegative(Image img) { ///
   assert (img != NULL);
   // Insert your code here!
+  for (int i = 0; i<img->width*img->height;++i){
+    img->pixel[i]=PixMax-img->pixel[i];   // Iterate through each pixel and compute its negative value
+
+  }
 }
 
 /// Apply threshold to image.
@@ -417,8 +422,14 @@ void ImageThreshold(Image img, uint8 thr) { ///
 /// darken the image if factor<1.0.
 void ImageBrighten(Image img, double factor) { ///
   assert (img != NULL);
-  // ? assert (factor >= 0.0);
+  assert (factor >= 0.0);
   // Insert your code here!
+  uint8 maxxval=img->maxval;
+  for (int i = 0; i<img->width*img->height;++i){
+    double newlevel= img->pixel[i]*factor;
+    img->pixel[i]=(newlevel>maxxval)?maxxval:(uint8) newlevel;  // Saturate at maxval
+
+}
 }
 
 
