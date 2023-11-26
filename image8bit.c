@@ -349,12 +349,17 @@ int ImageValidPos(Image img, int x, int y) { ///
 }
 
 /// Check if rectangular area (x,y,w,h) is completely inside img.
+
 int ImageValidRect(Image img, int x, int y, int w, int h) { ///
   assert (img != NULL);
   // Insert your code here!
-  int first_test = x >= 0 && y >= 0 && w > 0 && h > 0;
-  int second_test =  x <= img-> width && y <= img->height && w <= img->width && h <= img->height;
-  return first_test, second_test;
+  // Verifica se uma area retangular esta completamente dentro da imagem.
+  return (0 <= x && x + w <= img->width) && (0 <= y && y + h <= img->height);
+
+  //int first_test = x >= 0 && y >= 0 && w > 0 && h > 0;
+  //int second_test =  x <= img-> width && y <= img->height && w <= img->width && h <= img->height;
+  //return first_test, second_test;
+
 }
 
 /// Pixel get & set operations
@@ -465,6 +470,23 @@ void ImageBrighten(Image img, double factor) { ///
 Image ImageRotate(Image img) { ///
   assert (img != NULL);
   // Insert your code here!
+  // Create a new image with the same dimensions
+  Image rotatedimg = ImageCreate(img->height, img->width, img->maxval);
+  // image creation failed
+  if (rotatedimg == NULL) {
+    return NULL;
+  }
+
+  // Iterate through each pixel and copy it to the new image
+  for (int y = 0; y < img->height; ++y) {
+    for (int x = 0; x < img->width; ++x) {
+      // Calculate the rotated x-coordinate
+
+      // Set the pixel value in the rotated image and get the pixel from the original image
+      ImageSetPixel(rotatedimg, y, img->width - x - 1, ImageGetPixel(img, x, y));
+    }
+  }
+  return rotatedimg;
 }
 
 /// Mirror an image = flip left-right.
@@ -477,7 +499,24 @@ Image ImageRotate(Image img) { ///
 Image ImageMirror(Image img) { ///
   assert (img != NULL);
   // Insert your code here!
-}
+  // Create a new image with the same dimensions
+  Image mirrorimg = ImageCreate(img->width, img->height, img->maxval);
+  // image creation failed
+  if (mirrorimg == NULL) {
+    return NULL;
+  }
+
+  // Iterate through each pixel and copy it to the new image
+  for (int y = 0; y < img->height; ++y) {
+    for (int x = 0; x < img->width; ++x) {
+      // Calculate the mirrored x-coordinate
+      // Set the pixel value in the mirrored image and copy the pixel from the original image
+
+      ImageSetPixel(mirrorimg, x, y, ImageGetPixel(img, img->width - x - 1, y));
+    }
+  }
+  return mirrorimg;
+  }
 
 /// Crop a rectangular subimage from img.
 /// The rectangle is specified by the top left corner coords (x, y) and
@@ -495,6 +534,21 @@ Image ImageCrop(Image img, int x, int y, int w, int h) { ///
   assert (img != NULL);
   assert (ImageValidRect(img, x, y, w, h));
   // Insert your code here!
+  // Create a new image with the same dimensions
+  Image croppedimg = ImageCreate(w, h, img->maxval);
+  // image creation failed
+  if (croppedimg == NULL) {
+    return NULL;
+  }
+
+  // Iterate through each pixel and copy it to the new image
+  for (int i = 0; i < h; ++i) {
+    for (int j = 0; j < w; j++) {
+      // Set the pixel value in the cropped image and copy the pixel from the original image
+      ImageSetPixel(croppedimg, j, i, ImageGetPixel(img, x + j, y + i));
+    }
+  }
+  return croppedimg;
 }
 
 
@@ -509,6 +563,14 @@ void ImagePaste(Image img1, int x, int y, Image img2) { ///
   assert (img2 != NULL);
   assert (ImageValidRect(img1, x, y, img2->width, img2->height));
   // Insert your code here!
+  // Iterate through each pixel and copy it to the new image and paste img2 into img1 at the specified position
+
+  for (int i = 0; i < img2->height; ++i) {
+    for (int j = 0; j < img2->width; j++) {
+      // Set the pixel value in the pasted image and copy the pixel from the original image
+      ImageSetPixel(img1, x + j, y + i, ImageGetPixel(img2, j, i));
+    }
+  }
 }
 
 /// Blend an image into a larger image.
@@ -522,6 +584,21 @@ void ImageBlend(Image img1, int x, int y, Image img2, double alpha) { ///
   assert (img2 != NULL);
   assert (ImageValidRect(img1, x, y, img2->width, img2->height));
   // Insert your code here!
+  // Iterate through each pixel and copy it to the new image and blend img2 into img1 at the specified position
+
+  for (int i = 0; i < img2->height; ++i) {
+    for (int j = 0; j < img2->width; j++) {
+      
+      // Set the pixel value in the blended image and copy the pixel from the original image
+      // Get the pixel values from img1 and img2
+
+      uint8 pixel1 = ImageGetPixel(img1, x + j, y + i);
+      uint8 pixel2 = ImageGetPixel(img2, j, i);
+      uint8 newpixel = pixel1 * (1 - alpha) + pixel2 * alpha;
+      // Set the blended pixel value in img1
+      ImageSetPixel(img1, x + j, y + i, newpixel);
+    }
+  }
 }
 
 /// Compare an image to a subimage of a larger image.
@@ -532,6 +609,21 @@ int ImageMatchSubImage(Image img1, int x, int y, Image img2) { ///
   assert (img2 != NULL);
   assert (ImageValidPos(img1, x, y));
   // Insert your code here!
+  // Iterate through each pixel and copy it to the new image and compare img2 to img1 at the specified position
+
+  for (int i = 0; i < img2->height; ++i) {
+    //++j??
+    for (int j = 0; j < img2->width; j++) {
+      // Get the pixel values from img1 and img2
+      uint8 pixel1 = ImageGetPixel(img1, x + j, y + i);
+      uint8 pixel2 = ImageGetPixel(img2, j, i);
+      // Compare the pixel values
+      if (pixel1 != pixel2) {
+        return 0;
+      }
+    }
+  }
+  return 1;
 }
 
 /// Locate a subimage inside another image.
@@ -542,6 +634,19 @@ int ImageLocateSubImage(Image img1, int* px, int* py, Image img2) { ///
   assert (img1 != NULL);
   assert (img2 != NULL);
   // Insert your code here!
+  // Iterate through each pixel and copy it to the new image and locate img2 inside img1
+  for (int i = 0; i < img1->height - img2->height + 1; ++i) {
+    for (int j = 0; j < img1->width - img2->width + 1; j++) {
+      // Compare the pixel values
+      if (ImageMatchSubImage(img1, j, i, img2)) {
+        *px = j;
+        *py = i;
+        return 1;
+      }
+    }
+  }
+  //nothing found return False
+  return 0;
 }
 
 
@@ -553,5 +658,39 @@ int ImageLocateSubImage(Image img1, int* px, int* py, Image img2) { ///
 /// The image is changed in-place.
 void ImageBlur(Image img, int dx, int dy) { ///
   // Insert your code here!
+  // Create a new image with the same dimensions
+  Image blurredimg = ImageCreate(img->width, img->height, img->maxval);
+  // image creation failed
+  if (blurredimg == NULL) {
+    return;
+  }
+
+  // Iterate through each pixel and copy it to the new image
+  for (int i = 0; i < img->height; ++i) {
+    for (int j = 0; j < img->width; j++) {
+      // Calculate the blurred pixel value
+      uint8 newpixel = 0;
+      int count = 0;
+      for (int y = i - dy; y <= i + dy; ++y) {
+        for (int x = j - dx; x <= j + dx; ++x) {
+          if (ImageValidPos(img, x, y)) {
+            newpixel += ImageGetPixel(img, x, y);
+            count++;
+          }
+        }
+      }
+      newpixel /= count;
+      // Set the blurred pixel value in the new image
+      ImageSetPixel(blurredimg, j, i, newpixel);
+    }
+  }
+  // Copy the blurred image to the original image
+  for (int i = 0; i < img->height; ++i) {
+    for (int j = 0; j < img->width; j++) {
+      ImageSetPixel(img, j, i, ImageGetPixel(blurredimg, j, i));
+    }
+  }
+  // Destroy the blurred image
+  ImageDestroy(&blurredimg);
 }
 
