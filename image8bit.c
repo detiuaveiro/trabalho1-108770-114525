@@ -671,20 +671,19 @@ void ImageBlur(Image img, int dx, int dy) { ///
   for (int i = 0; i < img->height; ++i) {
     for (int j = 0; j < img->width; ++j) {
       // Calculate the blurred pixel value
-      uint8 newpixel = 0;
+      double newpixel = 0.0;
       int count = 0;
       for (int y = i - dy; y <= i + dy; ++y) {
         for (int x = j - dx; x <= j + dx; ++x) {
           if (ImageValidPos(img, x, y)) {
             newpixel += (double)ImageGetPixel(img, x, y) + 0.5; // + 0.5 -> As when programing with C, rounding is always done downwards, so we add 0.5 to ensure that the rounding is done correctly.
- 
             count++;
           }
         }
       }
       newpixel /= count;
       // Set the blurred pixel value in the new image
-      ImageSetPixel(blurredimg, j, i, newpixel);
+      ImageSetPixel(blurredimg, j, i, (uint8)newpixel);
     }
   }
   // Copy the blurred image to the original image
@@ -696,4 +695,3 @@ void ImageBlur(Image img, int dx, int dy) { ///
   // Destroy the blurred image
   ImageDestroy(&blurredimg);
 }
-
