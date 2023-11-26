@@ -439,7 +439,7 @@ void ImageBrighten(Image img, double factor) { ///
   // Insert your code here!
   for (int i = 0; i<img->width*img->height;++i){
     double newPixelValue = img->pixel[i] * factor;
-    uint8 newPV = (uint8)(newPixelValue + 0.5);
+    uint8 newPV = (uint8)(newPixelValue + 0.5); // + 0.5 -> As when programing with C, rounding is always done downwards, so we add 0.5 to ensure that the rounding is done correctly.
     img->pixel[i]= (newPV > PixMax) ? PixMax : newPV; // Iterate through each pixel and compute its new value
   
 }
@@ -594,7 +594,7 @@ void ImageBlend(Image img1, int x, int y, Image img2, double alpha) { ///
 
       uint8 pixel1 = ImageGetPixel(img1, x + j, y + i);
       uint8 pixel2 = ImageGetPixel(img2, j, i);
-      uint8 newpixel = (uint8)((1.0 - alpha)*pixel1  + pixel2*alpha + 0.5);
+      uint8 newpixel = (uint8)((1.0 - alpha)*pixel1  + pixel2*alpha + 0.5); // + 0.5 -> As when programing with C, rounding is always done downwards, so we add 0.5 to ensure that the rounding is done correctly.
  
 
       // Set the blended pixel value in img1
@@ -676,7 +676,7 @@ void ImageBlur(Image img, int dx, int dy) { ///
       for (int y = i - dy; y <= i + dy; ++y) {
         for (int x = j - dx; x <= j + dx; ++x) {
           if (ImageValidPos(img, x, y)) {
-            newpixel += (double)ImageGetPixel(img, x, y) + 0.5;
+            newpixel += (double)ImageGetPixel(img, x, y) + 0.5; // + 0.5 -> As when programing with C, rounding is always done downwards, so we add 0.5 to ensure that the rounding is done correctly.
  
             count++;
           }
