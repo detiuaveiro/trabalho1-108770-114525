@@ -424,7 +424,7 @@ void ImageThreshold(Image img, uint8 thr) { ///
   assert (img != NULL);
   // Insert your code here!
   for (int i = 0; i<img->width*img->height;++i){
-    img->pixel[i]=img->pixel[i]<thr?0:ImageMaxval; // Iterate through each pixel and compute its new value
+    img->pixel[i]=img->pixel[i]<thr?0:PixMax; // Iterate through each pixel and compute its new value
   
 }
 }
