@@ -424,7 +424,7 @@ void ImageThreshold(Image img, uint8 thr) { ///
   assert (img != NULL);
   // Insert your code here!
   for (int i = 0; i<img->width*img->height;++i){
-    img->pixel[i]=img->pixel[i]<thr?0:PixMax; // Iterate through each pixel and compute its new value
+    img->pixel[i]=(img->pixel[i]<thr)?0:PixMax; // Iterate through each pixel and compute its new value
   
 }
 }
@@ -433,16 +433,16 @@ void ImageThreshold(Image img, uint8 thr) { ///
 /// Multiply each pixel level by a factor, but saturate at maxval.
 /// This will brighten the image if factor>1.0 and
 /// darken the image if factor<1.0.
-
 void ImageBrighten(Image img, double factor) { ///
   assert (img != NULL);
   assert (factor >= 0.0);
   // Insert your code here!
   for (int i = 0; i<img->width*img->height;++i){
-    uint8 level=img->pixel[i]; // Get the pixel value
-    level = level * factor > PixMax ? PixMax : level * factor; // Iterate through each pixel and compute its new value
-  }
+    double newPixelValue = img->pixel[i] * factor;
+    uint8 newPV = (uint8)(newPixelValue + 0.5);
+    img->pixel[i]= (newPV > PixMax) ? PixMax : newPV; // Iterate through each pixel and compute its new value
   
+}
 }
 
 
@@ -594,7 +594,9 @@ void ImageBlend(Image img1, int x, int y, Image img2, double alpha) { ///
 
       uint8 pixel1 = ImageGetPixel(img1, x + j, y + i);
       uint8 pixel2 = ImageGetPixel(img2, j, i);
-      uint8 newpixel = pixel1 * (1 - alpha) + pixel2 * alpha;
+      uint8 newpixel = (uint8)((1.0 - alpha)*pixel1  + pixel2*alpha + 0.5);
+ 
+
       // Set the blended pixel value in img1
       ImageSetPixel(img1, x + j, y + i, newpixel);
     }
@@ -667,14 +669,15 @@ void ImageBlur(Image img, int dx, int dy) { ///
 
   // Iterate through each pixel and copy it to the new image
   for (int i = 0; i < img->height; ++i) {
-    for (int j = 0; j < img->width; j++) {
+    for (int j = 0; j < img->width; ++j) {
       // Calculate the blurred pixel value
       uint8 newpixel = 0;
       int count = 0;
       for (int y = i - dy; y <= i + dy; ++y) {
         for (int x = j - dx; x <= j + dx; ++x) {
           if (ImageValidPos(img, x, y)) {
-            newpixel += ImageGetPixel(img, x, y);
+            newpixel += (double)ImageGetPixel(img, x, y) + 0.5;
+ 
             count++;
           }
         }
@@ -686,7 +689,7 @@ void ImageBlur(Image img, int dx, int dy) { ///
   }
   // Copy the blurred image to the original image
   for (int i = 0; i < img->height; ++i) {
-    for (int j = 0; j < img->width; j++) {
+    for (int j = 0; j < img->width; ++j) {
       ImageSetPixel(img, j, i, ImageGetPixel(blurredimg, j, i));
     }
   }
