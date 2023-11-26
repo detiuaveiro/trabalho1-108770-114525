@@ -424,9 +424,9 @@ void ImageThreshold(Image img, uint8 thr) { ///
   assert (img != NULL);
   // Insert your code here!
   for (int i = 0; i<img->width*img->height;++i){
-    uint8 level=img->pixel[i];
-    level = level <  thr ? 0 : PixMax ;
-  }
+    img->pixel[i]=img->pixel[i]<thr?0:ImageMaxval; // Iterate through each pixel and compute its new value
+  
+}
 }
 
 /// Brighten image by a factor.
